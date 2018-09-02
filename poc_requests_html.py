@@ -1,5 +1,7 @@
 import sys
+import timeit
 
+import requests
 from requests_html import HTMLSession
 
 
@@ -35,19 +37,26 @@ class Crawler(object):
             name, *selector = line.split(",")
             self.selectors[name] = selector
 
-    def read_input(self):
-        self.url = sys.argv[2]
+    def read_input(self, url=None, file_name=None):
+        self.url = url or sys.argv[2]
 
-        with open(sys.argv[1]) as infile:
+        with open(file_name or sys.argv[1]) as infile:
             self.data = self.parse(infile.read())
 
 
-def main():
+def main(url=None, file_name=None):
     crawler = Crawler()
-    crawler.read_input()
+    crawler.read_input(url=url, file_name=file_name)
     crawler.crawl()
 
     print(crawler.extracted_data)
+
+
+def how_long():
+    example_url = "https://www.jetpens.com/Pilot-Metropolitan-Fountain-Pen-Black-Plain-Medium-Italic-Nib/pd/19271"
+    example_file = "jetpens.txt"
+    t = timeit.Timer(lambda: main(url=example_url, file_name=example_file))
+    print(t.timeit(number=20)/20)
 
 
 if __name__ == "__main__":
